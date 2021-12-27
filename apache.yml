@@ -1,17 +1,24 @@
-- hosts: webapps
-  remote_user: ubuntu
-  become: true
+---
+- name: Install and enable apache
+  hosts: all
+  become: yes
+
+  vars:
+    package_name: apache2  # adapt to your distribution
+
   tasks:
-  - name: Install apache httpd  (state=present is optional)
-    apt:
-      name: apache2
-      state: present
-  - name: Start Apache2 server
-    service:
-      name: apache2
-      state: started
-      enabled: True
-  - name: Deploy static website
-    copy:
-      src: index.html
-      dest: /var/www/html/
+
+    - name: Make sure apache is installed
+      package:
+        name: "{{ package_name }}"
+        state: present
+
+    - name: Make sure apache is active on boot and started
+      service:
+        name: "{{ package_name }}"
+        enabled: true
+        state: started
+    - name: Deploy static website
+      copy:
+        src: index.html
+        dest: /var/www/html/
